@@ -1,0 +1,20 @@
+{
+  "name": "flappy-peaks",
+  "version": "0.0.1",
+  "description": "Flappy Bird au couleurs de Peaks !",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "publish": "git fetch && git push origin refs/remotes/origin/master:gh-pages"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/peaks-lyon/flappy-peaks.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/peaks-lyon/flappy-peaks/issues"
+  },
+  "homepage": "https://github.com/peaks-lyon/flappy-peaks"
+}
