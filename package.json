@@ -5,7 +5,7 @@
   "main": "index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "publish": "git push origin refs/remotes/origin/master:gh-pages"
+    "publish": "git fetch && git push origin refs/remotes/origin/master:gh-pages"
   },
   "repository": {
     "type": "git",
