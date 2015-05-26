@@ -1,17 +1,24 @@
-var flappyPeaksFirebaseRef = new Firebase("https://flappypeaks.firebaseio.com/highscores");
-var date = new Date().toLocaleString();
+var FirebaseRepository = (function () {
+    function FirebaseRepository() {
+        this.flappyPeaksFirebaseRef = new Firebase("https://flappypeaks.firebaseio.com/highscores");
+        this.date = new Date().toLocaleString();
+    }
 
-function saveHighscore (email, bestScore) {
-    var childRef = flappyPeaksFirebaseRef.push();
-    childRef.set({
-        email: email,
-        bestscore: bestScore,
-        date: date
-    });
-}
+    FirebaseRepository.prototype.saveHighscore = function (email, bestScore) {
+        var childRef = this.flappyPeaksFirebaseRef.push();
+        childRef.set({
+            email: email,
+            bestscore: bestScore,
+            date: this.date
+        });
+    };
 
-function findBestHighScore() {
-    flappyPeaksFirebaseRef.orderByChild("bestscore").limitToLast(1).once("value", function(data) {
-        console.log(data.val());
-    });
-}
+    FirebaseRepository.prototype.findBestHighScore = function () {
+        this.flappyPeaksFirebaseRef.orderByChild("bestscore").limitToLast(1).once("value", function(data) {
+            var bestHighScore = data.val().bestscore;
+            console.log(bestHighScore);
+        });
+    };
+
+    return FirebaseRepository;
+})();
