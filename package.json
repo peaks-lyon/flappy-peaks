@@ -5,7 +5,8 @@
   "main": "index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "publish": "git fetch && git push origin refs/remotes/origin/master:gh-pages"
+    "publish": "git fetch && git push origin refs/remotes/origin/master:gh-pages",
+    "gulp": "gulp"
   },
   "repository": {
     "type": "git",
@@ -16,5 +17,9 @@
   "bugs": {
     "url": "https://github.com/peaks-lyon/flappy-peaks/issues"
   },
-  "homepage": "https://github.com/peaks-lyon/flappy-peaks"
+  "homepage": "https://github.com/peaks-lyon/flappy-peaks",
+  "devDependencies": {
+    "gulp-connect": "latest",
+    "gulp": "latest"
+  }
 }
