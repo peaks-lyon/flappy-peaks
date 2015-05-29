@@ -4,11 +4,13 @@ game.transparent = true;
 
 var gameState = {};
 // On crée une variable "load" à notre objet gameState
-gameState.load = function() { };  
+gameState.load = function() { };
 gameState.load.prototype = {
     preload: function() {
         this.game = game;
-    
+
+        this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+
         // On fait en sorte que le jeu se redimensionne selon la taille de l'écran
         window.addEventListener('resize', function () {
 
@@ -60,13 +62,13 @@ gameState.load.prototype = {
         // Quand on clique sur le bouton play
         this.game.load.audio('menu', ['sons/menu.wav', 'sons/menu.ogg']);
     },
-    
+
     create: function() {
         game.state.start('main');
     }
 };
 
-gameState.main = function() { };  
+gameState.main = function() { };
 gameState.main.prototype = {
     create: function() {
         this.gameStart = false;
@@ -148,11 +150,11 @@ gameState.main.prototype = {
         this.bird.animations.add('fly');
         // On fait démarrer l'animation, avec 8 images par seconde et répétée en boucle
         this.bird.animations.play('fly', 8, true);
-        
+
         // On ajoute l'animation qui va permettre à l'oiseau de flotter dans les airs
         this.tweenFlap = this.game.add.tween(this.bird);
         this.tweenFlap.to({ y: this.bird.y + 20}, 400, Phaser.Easing.Quadratic.InOut, true, 0, 10000000000, true);
-        
+
         // Au click, on appelle la fonction "start()"
         this.game.input.onTap.add(this.start, this);
 
@@ -175,13 +177,13 @@ gameState.main.prototype = {
         this.game.input.onTap.removeAll();
         // Pour ajouter le jump à l'événement down sur le jeu
         this.game.input.onDown.add(this.jump, this);
-        
+
         // gravité
         this.bird.body.gravity.y = 2000;
         this.bird.body.velocity.y = -600;
 
         this.soundFlap.play();
-        
+
         this.birdInJump = true;
         this.tweenFlap.stop();
         this.bird.animations.stop('fly');
@@ -209,7 +211,7 @@ gameState.main.prototype = {
             // On stop l'animation de rotation quand l'oiseau tombe
             if(this.tweenFall != null)
                 this.tweenFall.stop();
-            
+
             // On ajoute l'animation de rotation quand l'oiseau saute
             this.tweenJump = game.add.tween(this.bird);
             this.tweenJump.to({rotation: -Math.PI / 8}, 100).start();
@@ -231,11 +233,11 @@ gameState.main.prototype = {
             // Donc quand la vitesse vers le haut atteint 0 (à cause de la gravité)
                 if(this.bird.body.velocity.y > 0 && this.birdInJump) {
                     this.birdInJump = false;
-                    
+
                     // on stop l'animation de rotation quand l'oiseau saute
                     if(this.tweenJump != null)
                         this.tweenJump.stop();
-                    
+
                     // On ajoute l'animation de rotation quand l'oiseau tombe
                     // On la fait démarrer avec un délai de 200 ms
                     this.tweenFall = this.game.add.tween(this.bird);
@@ -259,12 +261,12 @@ gameState.main.prototype = {
 
             // Si l'oiseau dépasse un tuyau
             if(this.pipesToCheckForScore.length != 0 && this.pipesToCheckForScore[0].x + this.pipesToCheckForScore[0].width / 2 < this.bird.body.center.x) {
-                
+
                 this.soundPoint.play();
 
                 this.pipesToCheckForScore.splice(0, 1);
                 this.score++;
-                
+
                 // on découpe le nombre en des chiffres individuels
                 var digits = this.score.toString().split('');
                 var widthNumbers = 0;
@@ -272,7 +274,7 @@ gameState.main.prototype = {
                 for(var j = 0; j < this.spritesScore.length; j++)
                     this.spritesScore[j].kill();
                 this.spritesScore = new Array();
-                
+
                 // on met en forme le score avec les sprites
                 for(var i = 0; i < digits.length; i++) {
                     var spriteScore = this.game.add.sprite(widthNumbers, 100, 'numbers');
@@ -348,13 +350,13 @@ gameState.main.prototype = {
             }
 
             // On change la position du bout de tuyau
-            pipeEnd.reset(x - 4, yPipe);        
+            pipeEnd.reset(x - 4, yPipe);
             // On change la vitesse pour qu'il se déplace en même temps que le sol
             this.game.physics.enable(pipeEnd);
             pipeEnd.body.velocity.x = -250;
             pipeEnd.body.immovable = true;
             pipeEnd.body.rebound = false;
-            
+
             this.arrayPipes[this.arrayPipes.length - 1].push(pipeEnd);
         }
     },
@@ -368,7 +370,7 @@ gameState.main.prototype = {
         var hole = Math.round(Math.random() * (nbPiecesOfPipes - 7)) + 3;
 
         for (var i = 0; i <= nbPiecesOfPipes; i++)
-            if (i > hole + 1 || i < hole - 1)               
+            if (i > hole + 1 || i < hole - 1)
                 this.addPieceOfPipe(this.game.world.width, this.game.world.height - this.ground.height - i * this.game.world.height / nbPiecesOfPipes, i, hole);
     },
 
@@ -376,7 +378,7 @@ gameState.main.prototype = {
         if(!this.birdHitGround) {
             this.bird.body.gravity.y = 0;
             this.bird.body.velocity.y = 0;
-            
+
             if(!this.birdHitPipe)
                 this.soundHit.play();
 
