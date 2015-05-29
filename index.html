@@ -8,13 +8,47 @@
 		<script type="text/javascript" src="vendor/phaser.min.js"></script>
 		<script type="text/javascript" src="vendor/firebase.min.js"></script>
 
-		<script type="text/javascript" src="peaks/firebase.js"/></script>
-		<script type="text/javascript" src="main.js"/></script>
+		<script type="text/javascript" src="peaks/modal.js"></script>
+		<script type="text/javascript" src="peaks/firebase.js"></script>
+		<script type="text/javascript" src="main.js"></script>
 
 		<link rel="stylesheet" href="style.css"/>
 	</head>
 
 	<body>
 		<div id="flappyBird"></div>
+
+        <div class="modal" id="modalRegisterForm">
+            <form id="registerForm" action="#">
+                <div>
+                    <input type="text" name="mail" placeholder="Mail" />
+                </div>
+
+                <input type="hidden" id="score" value="0" />
+                <input type="submit" class="btn btnSuccess" value="Enregistrer mon score" />
+                <button class="btn btnCloseModal">Revenir au jeu</button>
+            </form>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function(event) {
+                var modal = new Modal('#modalRegisterForm');
+
+                document.querySelector('#modalRegisterForm .btnCloseModal').addEventListener('click', function() {
+                    modal.hide();
+                    event.preventDefault();
+                });
+
+                document.querySelector('#registerForm').addEventListener("submit", function(event) {
+                    new FirebaseRepository().saveHighscore(
+                        this.elements.mail.value,
+                        this.elements.score.value
+                    );
+
+                    modal.hide();
+                    event.preventDefault();
+                });
+            });
+        </script>
 	</body>
 </html>
