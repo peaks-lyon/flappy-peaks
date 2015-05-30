@@ -180,7 +180,7 @@ gameState.main.prototype = {
 
         // gravité
         this.bird.body.gravity.y = 2000;
-        this.bird.body.velocity.y = -600;
+        this.bird.body.velocity.y = -500; // l'oiseau saute moins haute => plus facile entre les pipes
 
         this.soundFlap.play();
 
@@ -290,8 +290,8 @@ gameState.main.prototype = {
                 }
             }
 
-            // Quand le premier tuyau se trouve au milieu du terrain
-            if(this.pipesToCheckForAdd.length != 0 && this.pipesToCheckForAdd[0].x + this.pipesToCheckForAdd[0].width / 2 < this.game.world.width / 2) {
+            // Quand le premier tuyau à passer les 2/3 du terrain => plus d'espace entre les pipes
+            if(this.pipesToCheckForAdd.length != 0 && this.pipesToCheckForAdd[0].x + this.pipesToCheckForAdd[0].width / 2 < this.game.world.width / 3) {
                 this.pipesToCheckForAdd.splice(0, 1);
                 // On ajoute un nouveau tuyau
                 this.addGroupPipes();
