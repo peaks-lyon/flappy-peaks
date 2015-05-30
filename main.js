@@ -42,8 +42,9 @@ gameState.load.prototype = {
         // Image "Game Over"
         this.game.load.image('gameOver', 'img/game-over.png');
 
-        // Bouton play
+        // Boutons
         this.game.load.image('buttonPlay', 'img/button-play.png');
+        this.game.load.image('buttonRegister', 'img/button-register.png');
 
         /**** AUDIO *****/
 
@@ -141,10 +142,16 @@ gameState.main.prototype = {
         this.gameOver.alpha = 0;
 
         // Bouton play
-        this.buttonPlay = this.game.add.sprite(this.game.width / 2, 500, 'buttonPlay');
+        this.buttonPlay = this.game.add.sprite(this.game.width / 2, 430, 'buttonPlay');
         this.buttonPlay.x -= this.buttonPlay.width / 2;
         this.buttonPlay.alpha = 0;
-        this.buttonPlay.inputEnabled = true;
+        this.buttonPlay.inputEnabled = true;// Bouton play
+
+        // Bouton register
+        this.buttonRegister = this.game.add.sprite(this.game.width / 2, 580, 'buttonRegister');
+        this.buttonRegister.x -= this.buttonRegister.width / 2;
+        this.buttonRegister.alpha = 0;
+        this.buttonRegister.inputEnabled = true;
 
         // On ajoute l'animation du battement des ailes, animation contenu dans le JSON
         this.bird.animations.add('fly');
@@ -165,6 +172,8 @@ gameState.main.prototype = {
         this.soundFlap = game.add.audio('flap', 1);
         this.soundPoint = game.add.audio('point', 1);
         this.soundMenu = game.add.audio('menu', 1);
+
+        this.registerModal = new Modal('#modalRegisterForm');
     },
 
     start: function() {
@@ -417,6 +426,7 @@ gameState.main.prototype = {
         // on fait apparaitre le game over et le bouton play
         this.game.add.tween(this.gameOver).to( { alpha: 1 }, 300, Phaser.Easing.Default, true);
         this.game.add.tween(this.buttonPlay).to( { alpha: 1 }, 300, Phaser.Easing.Default, true);
+        this.game.add.tween(this.buttonRegister).to( { alpha: 1 }, 300, Phaser.Easing.Default, true);
         this.bird.body.checkCollision.down = false;
 
         var self = this;
@@ -428,6 +438,16 @@ gameState.main.prototype = {
         this.buttonPlay.events.onInputUp.add(function() {
             self.buttonPlay.y -= 10;
             self.restart();
+        });
+
+        // Evénements sur le bouton register
+        this.buttonRegister.events.onInputDown.add(function() {
+            self.buttonRegister.y += 10;
+        });
+        this.buttonRegister.events.onInputUp.add(function() {
+            self.buttonRegister.y -= 10;
+            document.querySelector('#score').value = self.score;
+            self.registerModal.show();
         });
 
         // On supprime le timer

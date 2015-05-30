@@ -12,10 +12,10 @@ git clone https://github.com/peaks-lyon/flappy-peaks.git
 cd flappy-peaks
 npm install
 ```
-npm install permet de récupérer les dépendances pour lancer un server web local. Ce server permet de fournir les assets pour phaser.io 
+npm install permet de récupérer les dépendances pour lancer un serveur web local. Ce serveur permet de fournir les assets pour phaser.io 
 
 ## développement
-Il faut lancer un server web avec la commande suivante
+Il faut lancer un serveur web avec la commande suivante :
 ```sh
 npm run gulp connect
 ```
@@ -23,7 +23,7 @@ Ensuite, se rendre sur [http://localhost:8080](http://localhost:8080)
 
 
 # publier
-Pour publier le projet. Il faut lancer la commande
+Pour publier le projet :
 ```sh
 npm run publish
 ```
