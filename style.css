@@ -12,7 +12,7 @@ input, button {
     border: 1px solid #ccc;
 }
 
-input[type="text"] {
+input[type="email"] {
     height: 26px;
     width: 276px;
     color: #333;
@@ -69,3 +69,8 @@ input[type="text"] {
         border-color: #398439;
     }
 
+.btnCloseModal {
+    width:300px;
+    margin:0;
+    padding:0;
+}
