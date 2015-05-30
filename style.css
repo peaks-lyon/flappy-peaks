@@ -4,6 +4,7 @@ body {
 
 input, button {
     width:100%;
+    height: 40px;
     padding: 6px 12px;
     margin-bottom: 10px;
     border-radius: 4px;
@@ -23,7 +24,7 @@ input[type="email"] {
 	display: inline-block;
 }
 
-#registerForm {
+#registerForm, .btnCloseModal {
     width:300px;
     margin:0;
     padding:0;
@@ -68,9 +69,3 @@ input[type="email"] {
         background-color: #449d44;
         border-color: #398439;
     }
-
-.btnCloseModal {
-    width:300px;
-    margin:0;
-    padding:0;
-}
