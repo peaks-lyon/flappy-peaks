@@ -1,5 +1,12 @@
-// on déclare un objet Phaser qui va contenir notre jeu en 640*960px
-var game = new Phaser.Game(640, 960, Phaser.AUTO, 'flappyBird');
+const SAFE_ZONE_HEIGHT = 1000;
+const SAFE_ZONE_WIDTH = 640;
+const DELTA_PIPES = 420;
+
+var ratio = window.innerHeight / 1000;
+
+var width = (window.innerWidth / ratio > SAFE_ZONE_WIDTH) ? window.innerWidth / ratio : SAFE_ZONE_WIDTH;
+
+var game = new Phaser.Game(width, SAFE_ZONE_HEIGHT, Phaser.AUTO, 'flappyBird');
 game.transparent = true;
 
 var gameState = {};
@@ -10,11 +17,9 @@ gameState.load.prototype = {
         this.game = game;
 
         this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-
-        // On fait en sorte que le jeu se redimensionne selon la taille de l'écran
-        window.addEventListener('resize', function () {
-
-        });
+        this.game.scale.pageAlignHorizontally = true;
+        this.game.scale.pageAlignVertically = true;
+        this.game.scale.refresh();
 
         /**** SPRITES *****/
         // bird - png et json
@@ -32,6 +37,9 @@ gameState.load.prototype = {
         // bout des tuyaux
         this.game.load.image('pipeEndTop', 'img/pipe-end-top.png');
         this.game.load.image('pipeEndBottom', 'img/pipe-end-bottom.png');
+
+        // ceiling
+        this.game.load.image('ceiling', 'img/ceiling.png');
 
         // Chiffres pour le score
         this.game.load.atlasJSONHash('numbers', 'img/numbers.png', 'data/numbers.json');
@@ -86,16 +94,25 @@ gameState.main.prototype = {
 
         // Tuyaux
         this.pipes = game.add.group();
-        this.pipes.createMultiple(40, 'pipe');
+        this.pipes.createMultiple(60, 'pipe');
         this.pipesEndTop = game.add.group();
-        this.pipesEndTop.createMultiple(4, 'pipeEndTop');
+        this.pipesEndTop.createMultiple(6, 'pipeEndTop');
         this.pipesEndBottom = game.add.group();
-        this.pipesEndBottom.createMultiple(4, 'pipeEndBottom');
+        this.pipesEndBottom.createMultiple(6, 'pipeEndBottom');
         this.arrayPipes = new Array();
+
+        // Ceiling
+        this.ceiling = this.game.add.sprite(0, 0, 'ceiling');
+        this.ceiling.width = this.game.world.width * 2;
+        this.game.physics.enable(this.ceiling);
+        this.ceiling.body.immovable = true;
+        this.ceiling.body.velocity.x = -250;
+        this.ceiling.body.rebound = false;
 
         // création du sol
         this.ground = this.game.add.sprite(0, 0, 'ground');
-        this.ground.y = this.game.world.height - this.ground.height;
+        this.ground.y = this.game.world.height - this.ground.height + this.ceiling.height;
+        this.ground.width = this.game.world.width * 2;
 
         this.game.physics.enable(this.ground);
         this.ground.body.immovable = true;
@@ -237,6 +254,11 @@ gameState.main.prototype = {
             this.ground.x = 0;
         }
 
+        // On répète le plafond
+        if(this.ceiling.body.center.x <= 0) {
+            this.ceiling.x = 0;
+        }
+
         if(this.gameStart) {
             // Quand l'oiseau retombe après un jump
             // Donc quand la vitesse vers le haut atteint 0 (à cause de la gravité)
@@ -262,6 +284,8 @@ gameState.main.prototype = {
                 }
             // Si l'oiseau touche le sol
             this.game.physics.arcade.collide(this.bird, this.ground, this.hitGround, null, this);
+            // Si l'oiseau touche le plafond
+            this.game.physics.arcade.collide(this.bird, this.ceiling, this.setFriction, null, this);
             // Si l'oiseau touche un tuyau
             this.game.physics.arcade.collide(this.bird, this.pipes, this.hitPipe, null, this);
             // Si l'oiseau touche le bout d'un tuyau
@@ -299,8 +323,8 @@ gameState.main.prototype = {
                 }
             }
 
-            // Quand le premier tuyau à passer les 2/3 du terrain => plus d'espace entre les pipes
-            if(this.pipesToCheckForAdd.length != 0 && this.pipesToCheckForAdd[0].x + this.pipesToCheckForAdd[0].width / 2 < this.game.world.width / 3) {
+            // On rajoute un tuyau tous les DELTA_PIPES pixel
+            if(this.pipesToCheckForAdd.length != 0 && this.pipesToCheckForAdd[0].x + this.pipesToCheckForAdd[0].width / 2 < (this.game.world.width - DELTA_PIPES)) {
                 this.pipesToCheckForAdd.splice(0, 1);
                 // On ajoute un nouveau tuyau
                 this.addGroupPipes();
@@ -322,51 +346,53 @@ gameState.main.prototype = {
     addPieceOfPipe: function(x, y, i, hole, nbPipe) {
         // On prend le premier élément "mort" du groupe pipes
         var pipe = this.pipes.getFirstDead();
-        // On change la position du bout de tuyau
-        pipe.reset(x, y);
-        // On change la vitesse pour qu'il se déplace en même temps que le sol
-        this.game.physics.enable(pipe);
-        pipe.body.velocity.x = -250;
-        pipe.body.immovable = true;
-        pipe.body.rebound = false;
+        if(pipe) {
+            // On change la position du bout de tuyau
+            pipe.reset(x, y);
+            // On change la vitesse pour qu'il se déplace en même temps que le sol
+            this.game.physics.enable(pipe);
+            pipe.body.velocity.x = -250;
+            pipe.body.immovable = true;
+            pipe.body.rebound = false;
 
-        // on enregistre les tuyaux présents sur le terrain dans un tableau
-        // this.arrayPipes[index] = tuyau index en entier
-        // this.arrayPipes[index][2] = bout n°2 du tuyau index
-        if(i == 0) {
-            this.pipesToCheckForScore.push(pipe);
-            this.pipesToCheckForAdd.push(pipe);
-            this.arrayPipes.push(new Array());
-            this.arrayPipes[this.arrayPipes.length - 1].push(pipe);
-        } else {
-            this.arrayPipes[this.arrayPipes.length - 1].push(pipe);
-        }
-
-        // Si le trou est juste avant ou juste après, on place les pipeEnd
-        if(i == hole + 2 || i == hole - 2) {
-            var yDiff = 15;
-            var pipeEnd;
-            var yPipe;
-
-            if(i == hole + 2) {
-                // On prend le premier élément "mort" du groupe pipesEndTop
-                pipeEnd = this.pipesEndTop.getFirstDead();
-                yPipe = y + yDiff;
+            // on enregistre les tuyaux présents sur le terrain dans un tableau
+            // this.arrayPipes[index] = tuyau index en entier
+            // this.arrayPipes[index][2] = bout n°2 du tuyau index
+            if(i == 0) {
+                this.pipesToCheckForScore.push(pipe);
+                this.pipesToCheckForAdd.push(pipe);
+                this.arrayPipes.push(new Array());
+                this.arrayPipes[this.arrayPipes.length - 1].push(pipe);
             } else {
-                // On prend le premier élément "mort" du groupe pipesEndBottom
-                pipeEnd = this.pipesEndBottom.getFirstDead();
-                yPipe = y - yDiff;
+                this.arrayPipes[this.arrayPipes.length - 1].push(pipe);
             }
 
-            // On change la position du bout de tuyau
-            pipeEnd.reset(x - 4, yPipe);
-            // On change la vitesse pour qu'il se déplace en même temps que le sol
-            this.game.physics.enable(pipeEnd);
-            pipeEnd.body.velocity.x = -250;
-            pipeEnd.body.immovable = true;
-            pipeEnd.body.rebound = false;
+            // Si le trou est juste avant ou juste après, on place les pipeEnd
+            if(i == hole + 2 || i == hole - 2) {
+                var yDiff = 15;
+                var pipeEnd;
+                var yPipe;
 
-            this.arrayPipes[this.arrayPipes.length - 1].push(pipeEnd);
+                if(i == hole + 2) {
+                    // On prend le premier élément "mort" du groupe pipesEndTop
+                    pipeEnd = this.pipesEndTop.getFirstDead();
+                    yPipe = y + yDiff;
+                } else {
+                    // On prend le premier élément "mort" du groupe pipesEndBottom
+                    pipeEnd = this.pipesEndBottom.getFirstDead();
+                    yPipe = y - yDiff;
+                }
+
+                // On change la position du bout de tuyau
+                pipeEnd.reset(x - 4, yPipe);
+                // On change la vitesse pour qu'il se déplace en même temps que le sol
+                this.game.physics.enable(pipeEnd);
+                pipeEnd.body.velocity.x = -250;
+                pipeEnd.body.immovable = true;
+                pipeEnd.body.rebound = false;
+
+                this.arrayPipes[this.arrayPipes.length - 1].push(pipeEnd);
+            }
         }
     },
 
@@ -410,9 +436,16 @@ gameState.main.prototype = {
         }
     },
 
+    setFriction: function () {
+        this.bird.body.x -= this.ceiling.body.x - this.ceiling.body.prev.x;
+    },
+
     gameFinish: function() {
         // on arrête le sol
         this.ground.body.velocity.x = 0;
+
+        // on arrête le ceiling
+        this.ceiling.body.velocity.x = 0;
 
         // on arrête les tuyaux
         for(var i = 0; i < this.arrayPipes.length; i++)
