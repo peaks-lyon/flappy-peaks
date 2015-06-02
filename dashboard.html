@@ -1,0 +1,120 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Flappy Peaks Dashboard</title>
+
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+        <style type="text/css">
+
+        </style>
+	</head>
+
+	<body>
+		<div id="dashboard">
+
+		</div>
+
+		<script type="text/javascript" src="vendor/firebase.min.js"></script>
+		<script type="text/javascript" src="vendor/underscore.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function(event) {
+
+                var flappyPeaksFirebaseRef = new Firebase("https://flappypeaks.firebaseio.com/highscores");
+
+                var startdate = new Date('Mon Jun 08 2015 08:00:00 GMT+0200 (Paris, Madrid (heure d’été))');
+                var enddate = new Date('Mon Jun 08 2015 18:00:00 GMT+0200 (Paris, Madrid (heure d’été))');
+
+                function onlyDueDate(element) {
+                    var scoreDate = new Date(element.date);
+
+                    if (scoreDate >= startdate && scoreDate <= enddate) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+
+                function bestScoreByEmail(scores) {
+                    var bestScoreOfEachPlayer = {};
+
+                    _.each(scores, function(element) {
+                        if (bestScoreOfEachPlayer[element.email] === undefined) {
+                            bestScoreOfEachPlayer[element.email] = element;
+                        }
+
+                        if (parseInt(element.bestscore) > parseInt(bestScoreOfEachPlayer[element.email]["bestscore"])) {
+                            bestScoreOfEachPlayer[element.email] = element;
+                        }
+                    });
+
+                    return bestScoreOfEachPlayer;
+                }
+
+                function orderByScore(element) {
+                    return -element.bestscore;
+                }
+
+                function displayScores(scores) {
+                    var oldTable = document.querySelector('#dashboard table');
+                    var myTableDiv = document.getElementById("dashboard");
+                    var table = document.createElement('TABLE');
+                    table.border = '1';
+                    var tableBody = document.createElement('TBODY');
+
+                    table.appendChild(tableBody);
+
+                    var heading = new Array();
+                    heading[0] = "Score";
+                    heading[1] = "Date";
+                    heading[2] = "Email";
+
+                    //TABLE COLUMNS
+                    var tr = document.createElement('TR');
+                    tableBody.appendChild(tr);
+                    for (var i = 0; i < heading.length; i++) {
+                        var th = document.createElement('TH');
+                        th.appendChild(document.createTextNode(heading[i]));
+                        tr.appendChild(th);
+                    }
+
+                    //TABLE ROWS
+                    for (i = 0; i < scores.length; i++) {
+                        var tr = document.createElement('TR');
+
+                        _.each(scores[i], function(element, index) {
+                            if (index == 'date') {
+                                var date = new Date(element);
+                                element = date.toLocaleString();
+                            }
+                            var td = document.createElement('TD');
+                            td.appendChild(document.createTextNode(element));
+                            tr.appendChild(td);
+                        });
+
+                        tableBody.appendChild(tr);
+                    }
+
+                    if (oldTable) {
+                        myTableDiv.replaceChild(table, oldTable);
+                    } else {
+                        myTableDiv.appendChild(table);
+                    }
+                }
+
+                flappyPeaksFirebaseRef.on("value", function(data) {
+
+                    //var scoreOfTheDay = _.filter(data.val(), onlyDueDate);
+
+                    var playerBestScores = bestScoreByEmail(data.val());
+
+                    var orderedBestScores = _.sortBy(playerBestScores, orderByScore);
+
+                    displayScores(orderedBestScores);
+
+                });
+            });
+        </script>
+	</body>
+</html>
