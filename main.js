@@ -369,29 +369,28 @@ gameState.main.prototype = {
 
             // Si le trou est juste avant ou juste après, on place les pipeEnd
             if(i == hole + 2 || i == hole - 2) {
-                var yDiff = 15;
                 var pipeEnd;
-                var yPipe;
 
                 if(i == hole + 2) {
                     // On prend le premier élément "mort" du groupe pipesEndTop
                     pipeEnd = this.pipesEndTop.getFirstDead();
-                    yPipe = y + yDiff;
                 } else {
                     // On prend le premier élément "mort" du groupe pipesEndBottom
                     pipeEnd = this.pipesEndBottom.getFirstDead();
-                    yPipe = y - yDiff;
                 }
 
                 // On change la position du bout de tuyau
-                pipeEnd.reset(x - 4, yPipe);
+                pipeEnd.reset(x - 4, y);
                 // On change la vitesse pour qu'il se déplace en même temps que le sol
                 this.game.physics.enable(pipeEnd);
                 pipeEnd.body.velocity.x = -250;
                 pipeEnd.body.immovable = true;
                 pipeEnd.body.rebound = false;
 
-                this.arrayPipes[this.arrayPipes.length - 1].push(pipeEnd);
+                var pipesTemp = this.arrayPipes[this.arrayPipes.length - 1];
+                pipesTemp[pipesTemp.length - 1].kill();
+                pipesTemp.splice(pipesTemp.length, 1);
+                pipesTemp.push(pipeEnd);
             }
         }
     },
@@ -406,7 +405,7 @@ gameState.main.prototype = {
 
         for (var i = 0; i <= nbPiecesOfPipes; i++)
             if (i > hole + 1 || i < hole - 1)
-                this.addPieceOfPipe(this.game.world.width, this.game.world.height - this.ground.height - i * this.game.world.height / nbPiecesOfPipes, i, hole);
+                this.addPieceOfPipe(this.game.world.width, this.game.world.height - this.ground.height + this.ceiling.height - i * this.game.world.height / nbPiecesOfPipes, i, hole);
     },
 
     hitGround: function() {
