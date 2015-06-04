@@ -244,7 +244,7 @@ gameState.main.prototype = {
             // On note que l'oiseau est dans l'action jump
             this.birdInJump = true;
             // Saut
-            this.bird.body.velocity.y = -500;
+            this.bird.body.velocity.y = -600;
 
             // On stop l'animation de rotation quand l'oiseau tombe
             if(this.tweenFall != null)
