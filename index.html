@@ -20,8 +20,12 @@
 
         <div class="modal" id="modalRegisterForm">
             <form id="registerForm" action="#">
+                <div class="inlineFields">
+                    <input type="text" name="prenom" placeholder="Prénom" required />
+                    <input type="text" name="nom" placeholder="Nom" required />
+                </div>
                 <div>
-                    <input type="email" required name="mail" placeholder="Mail" />
+                    <input type="email" name="mail" placeholder="Mail" required />
                 </div>
 
                 <input type="hidden" id="score" value="0" />
@@ -42,11 +46,18 @@
                 document.querySelector('#registerForm').addEventListener("submit", function(event) {
                     new FirebaseRepository().saveHighscore(
                         this.elements.mail.value,
-                        this.elements.score.value
+                        this.elements.prenom.value,
+                        this.elements.nom.value,
+                        this.elements.score.value,
+                        function onComplete(error) {
+                            if (error) {
+                                alert("Nous n'avons pas réussi à sauvegarder ton score. Réessaye !")
+                            } else {
+                                modal.hide();
+                                event.preventDefault();
+                            }
+                        }
                     );
-
-                    modal.hide();
-                    event.preventDefault();
                 });
             });
         </script>

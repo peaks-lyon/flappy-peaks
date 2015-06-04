@@ -1,7 +1,11 @@
 const SAFE_ZONE_HEIGHT = 1000;
 const SAFE_ZONE_WIDTH = 640;
+const INITIAL_DELTA_PIPES = 450;
+const MIN_DELTA_PIPES = 300;
+const DELTA_VELOCITY = 10;
+const DELTA_PIPES = 10;
+const MODULO_PIPES = 3;
 const MAX_WIDTH = 1200;
-const DELTA_PIPES = 420;
 
 var ratio = window.innerHeight / 1000;
 
@@ -57,6 +61,9 @@ gameState.load.prototype = {
         this.game.load.image('buttonPlay', 'img/button-play.png');
         this.game.load.image('buttonRegister', 'img/button-register.png');
 
+        // Avion
+        this.game.load.image('plane', 'img/plane.png');
+
         /**** AUDIO *****/
 
         // Quand l'oiseau touche le sol ou un tuyau
@@ -88,12 +95,19 @@ gameState.main.prototype = {
 
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
+        this.gameVelocity = -250;
+        this.deltaPipes = 0;
+
         /**** SPRITES ****/
 
         // création de l'arrière-plan
         this.background = this.game.add.sprite(0, 0, 'background');
         this.background.width = this.game.world.width;
         this.background.height = this.game.world.height;
+
+        this.plane = this.game.add.sprite(this.game.world.width, this.game.world.height / 6, 'plane');
+        this.game.physics.enable(this.plane);
+        this.plane.body.velocity.x = -75;
 
         // Tuyaux
         this.pipes = game.add.group();
@@ -102,6 +116,11 @@ gameState.main.prototype = {
         this.pipesEndTop.createMultiple(6, 'pipeEndTop');
         this.pipesEndBottom = game.add.group();
         this.pipesEndBottom.createMultiple(6, 'pipeEndBottom');
+
+        this.game.physics.enable(this.pipes);
+        this.game.physics.enable(this.pipesEndTop);
+        this.game.physics.enable(this.pipesEndBottom);
+
         this.arrayPipes = new Array();
 
         // Ceiling
@@ -109,7 +128,7 @@ gameState.main.prototype = {
         this.ceiling.width = this.game.world.width * 2;
         this.game.physics.enable(this.ceiling);
         this.ceiling.body.immovable = true;
-        this.ceiling.body.velocity.x = -250;
+        this.ceiling.body.velocity.x = this.gameVelocity;
         this.ceiling.body.rebound = false;
 
         // création du sol
@@ -119,7 +138,7 @@ gameState.main.prototype = {
 
         this.game.physics.enable(this.ground);
         this.ground.body.immovable = true;
-        this.ground.body.velocity.x = -250;
+        this.ground.body.velocity.x = this.gameVelocity;
         this.ground.body.rebound = false;
 
         // Création de l'oiseau en tant que sprite dans le jeu avec coordonnées x = 200px et y = 0
@@ -262,6 +281,10 @@ gameState.main.prototype = {
             this.ceiling.x = 0;
         }
 
+        if(this.plane.body.x + this.plane.width <= -200) {
+            this.plane.body.x = this.game.width;
+        }
+
         if(this.gameStart) {
             // Quand l'oiseau retombe après un jump
             // Donc quand la vitesse vers le haut atteint 0 (à cause de la gravité)
@@ -303,6 +326,26 @@ gameState.main.prototype = {
                 this.pipesToCheckForScore.splice(0, 1);
                 this.score++;
 
+                if(this.score % MODULO_PIPES == 0) {
+                    this.gameVelocity -= DELTA_VELOCITY;
+                    this.deltaPipes = ((INITIAL_DELTA_PIPES - this.deltaPipes) <= MIN_DELTA_PIPES) ? MIN_DELTA_PIPES : this.deltaPipes + DELTA_PIPES;
+
+                    this.ground.body.velocity.x = this.gameVelocity;
+                    this.ceiling.body.velocity.x = this.gameVelocity;
+
+                    for (var i = 0; i < this.pipes.children.length; i++) {
+                        this.pipes.children[i].body.velocity.x = this.gameVelocity;
+                    }
+
+                    for (var i = 0; i < this.pipesEndTop.children.length; i++) {
+                        this.pipesEndTop.children[i].body.velocity.x = this.gameVelocity;
+                    }
+
+                    for (var i = 0; i < this.pipesEndBottom.children.length; i++) {
+                        this.pipesEndBottom.children[i].body.velocity.x = this.gameVelocity;
+                    }
+                }
+
                 // on découpe le nombre en des chiffres individuels
                 var digits = this.score.toString().split('');
                 var widthNumbers = 0;
@@ -326,8 +369,8 @@ gameState.main.prototype = {
                 }
             }
 
-            // On rajoute un tuyau tous les DELTA_PIPES pixel
-            if(this.pipesToCheckForAdd.length != 0 && this.pipesToCheckForAdd[0].x + this.pipesToCheckForAdd[0].width / 2 < (this.game.world.width - DELTA_PIPES)) {
+            // On rajoute un tuyau tous les INITIAL_DELTA_PIPES - this.deltaPipes pixel
+            if(this.pipesToCheckForAdd.length != 0 && this.pipesToCheckForAdd[0].x + this.pipesToCheckForAdd[0].width / 2 < (this.game.world.width - (INITIAL_DELTA_PIPES - this.deltaPipes))) {
                 this.pipesToCheckForAdd.splice(0, 1);
                 // On ajoute un nouveau tuyau
                 this.addGroupPipes();
@@ -353,8 +396,7 @@ gameState.main.prototype = {
             // On change la position du bout de tuyau
             pipe.reset(x, y);
             // On change la vitesse pour qu'il se déplace en même temps que le sol
-            this.game.physics.enable(pipe);
-            pipe.body.velocity.x = -250;
+            pipe.body.velocity.x = this.gameVelocity;
             pipe.body.immovable = true;
             pipe.body.rebound = false;
 
@@ -385,8 +427,7 @@ gameState.main.prototype = {
                 // On change la position du bout de tuyau
                 pipeEnd.reset(x - 4, y);
                 // On change la vitesse pour qu'il se déplace en même temps que le sol
-                this.game.physics.enable(pipeEnd);
-                pipeEnd.body.velocity.x = -250;
+                pipeEnd.body.velocity.x = this.gameVelocity;
                 pipeEnd.body.immovable = true;
                 pipeEnd.body.rebound = false;
 

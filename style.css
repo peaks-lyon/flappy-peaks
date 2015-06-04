@@ -4,8 +4,6 @@ body {
 }
 
 input, button {
-    width:100%;
-    height: 40px;
     padding: 6px 12px;
     margin-bottom: 10px;
     border-radius: 4px;
@@ -14,11 +12,24 @@ input, button {
     border: 1px solid #ccc;
 }
 
-input[type="email"] {
+button, input[type="submit"] {
+    width:100%;
+    height: 40px;
+}
+
+input {
     height: 26px;
-    width: 276px;
+    width: 274px;
     color: #333;
 }
+
+.inlineFields {
+    display: flex;
+    justify-content: space-between;
+}
+    .inlineFields input {
+        width: 119px;
+    }
 
 #flappyBird {
     margin: auto;
@@ -50,7 +61,7 @@ input[type="email"] {
     top: 0;
     left: 0;
     visibility: hidden;
-    background-color: rgba(0,0,0,0.7);
+    background-color: rgba(0,0,0,0.75);
     color: #ddd;
 }
 
