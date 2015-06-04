@@ -58,6 +58,9 @@ gameState.load.prototype = {
         this.game.load.image('buttonPlay', 'img/button-play.png');
         this.game.load.image('buttonRegister', 'img/button-register.png');
 
+        // Avion
+        this.game.load.image('plane', 'img/plane.png');
+
         /**** AUDIO *****/
 
         // Quand l'oiseau touche le sol ou un tuyau
@@ -99,6 +102,10 @@ gameState.main.prototype = {
         this.background.width = this.game.world.width;
         this.background.height = this.game.world.height;
 
+        this.plane = this.game.add.sprite(this.game.world.width, this.game.world.height / 6, 'plane');
+        this.game.physics.enable(this.plane);
+        this.plane.body.velocity.x = -250;
+
         // Tuyaux
         this.pipes = game.add.group();
         this.pipes.createMultiple(60, 'pipe');
@@ -118,7 +125,7 @@ gameState.main.prototype = {
         this.ceiling.width = this.game.world.width * 2;
         this.game.physics.enable(this.ceiling);
         this.ceiling.body.immovable = true;
-        this.ceiling.body.velocity.x = -250;
+        this.ceiling.body.velocity.x = this.gameVelocity;
         this.ceiling.body.rebound = false;
 
         // création du sol
@@ -128,7 +135,7 @@ gameState.main.prototype = {
 
         this.game.physics.enable(this.ground);
         this.ground.body.immovable = true;
-        this.ground.body.velocity.x = -250;
+        this.ground.body.velocity.x = this.gameVelocity;
         this.ground.body.rebound = false;
 
         // Création de l'oiseau en tant que sprite dans le jeu avec coordonnées x = 200px et y = 0
@@ -269,6 +276,10 @@ gameState.main.prototype = {
         // On répète le plafond
         if(this.ceiling.body.center.x <= 0) {
             this.ceiling.x = 0;
+        }
+
+        if(this.plane.body.x + this.plane.width <= 200) {
+            this.plane.body.x = this.game.width;
         }
 
         if(this.gameStart) {
