@@ -48,11 +48,16 @@
                         this.elements.mail.value,
                         this.elements.prenom.value,
                         this.elements.nom.value,
-                        this.elements.score.value
+                        this.elements.score.value,
+                        function onComplete(error) {
+                            if (error) {
+                                alert("Nous n'avons pas réussi à sauvegarder ton score. Réessaye !")
+                            } else {
+                                modal.hide();
+                                event.preventDefault();
+                            }
+                        }
                     );
-
-                    modal.hide();
-                    event.preventDefault();
                 });
             });
         </script>

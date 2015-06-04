@@ -4,7 +4,7 @@ var FirebaseRepository = (function () {
         this.date = new Date().toString();
     }
 
-    FirebaseRepository.prototype.saveHighscore = function (email, prenom, nom, bestScore) {
+    FirebaseRepository.prototype.saveHighscore = function (email, prenom, nom, bestScore, onComplete) {
         var childRef = this.flappyPeaksFirebaseRef.push();
         childRef.set({
             email: email,
@@ -12,7 +12,7 @@ var FirebaseRepository = (function () {
             nom: nom,
             bestscore: bestScore,
             date: this.date
-        });
+        }, onComplete);
     };
 
     return FirebaseRepository;
