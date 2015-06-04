@@ -5,10 +5,13 @@ const MIN_DELTA_PIPES = 300;
 const DELTA_VELOCITY = 10;
 const DELTA_PIPES = 10;
 const MODULO_PIPES = 3;
+const MAX_WIDTH = 1200;
 
 var ratio = window.innerHeight / 1000;
 
 var width = (window.innerWidth / ratio > SAFE_ZONE_WIDTH) ? window.innerWidth / ratio : SAFE_ZONE_WIDTH;
+
+width = (width > MAX_WIDTH) ? MAX_WIDTH : width;
 
 var game = new Phaser.Game(width, SAFE_ZONE_HEIGHT, Phaser.AUTO, 'flappyBird');
 game.transparent = true;
