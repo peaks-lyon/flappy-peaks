@@ -104,7 +104,7 @@ gameState.main.prototype = {
 
         this.plane = this.game.add.sprite(this.game.world.width, this.game.world.height / 6, 'plane');
         this.game.physics.enable(this.plane);
-        this.plane.body.velocity.x = -250;
+        this.plane.body.velocity.x = -75;
 
         // Tuyaux
         this.pipes = game.add.group();
