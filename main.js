@@ -1,6 +1,10 @@
 const SAFE_ZONE_HEIGHT = 1000;
 const SAFE_ZONE_WIDTH = 640;
-const DELTA_PIPES = 420;
+const INITIAL_DELTA_PIPES = 450;
+const MIN_DELTA_PIPES = 300;
+const DELTA_VELOCITY = 10;
+const DELTA_PIPES = 10;
+const MODULO_PIPES = 3;
 
 var ratio = window.innerHeight / 1000;
 
@@ -85,6 +89,9 @@ gameState.main.prototype = {
 
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
+        this.gameVelocity = -250;
+        this.deltaPipes = 0;
+
         /**** SPRITES ****/
 
         // création de l'arrière-plan
@@ -99,6 +106,11 @@ gameState.main.prototype = {
         this.pipesEndTop.createMultiple(6, 'pipeEndTop');
         this.pipesEndBottom = game.add.group();
         this.pipesEndBottom.createMultiple(6, 'pipeEndBottom');
+
+        this.game.physics.enable(this.pipes);
+        this.game.physics.enable(this.pipesEndTop);
+        this.game.physics.enable(this.pipesEndBottom);
+
         this.arrayPipes = new Array();
 
         // Ceiling
@@ -232,7 +244,7 @@ gameState.main.prototype = {
             // On note que l'oiseau est dans l'action jump
             this.birdInJump = true;
             // Saut
-            this.bird.body.velocity.y = -600;
+            this.bird.body.velocity.y = -500;
 
             // On stop l'animation de rotation quand l'oiseau tombe
             if(this.tweenFall != null)
@@ -300,6 +312,26 @@ gameState.main.prototype = {
                 this.pipesToCheckForScore.splice(0, 1);
                 this.score++;
 
+                if(this.score % MODULO_PIPES == 0) {
+                    this.gameVelocity -= DELTA_VELOCITY;
+                    this.deltaPipes = ((INITIAL_DELTA_PIPES - this.deltaPipes) <= MIN_DELTA_PIPES) ? MIN_DELTA_PIPES : this.deltaPipes + DELTA_PIPES;
+
+                    this.ground.body.velocity.x = this.gameVelocity;
+                    this.ceiling.body.velocity.x = this.gameVelocity;
+
+                    for (var i = 0; i < this.pipes.children.length; i++) {
+                        this.pipes.children[i].body.velocity.x = this.gameVelocity;
+                    }
+
+                    for (var i = 0; i < this.pipesEndTop.children.length; i++) {
+                        this.pipesEndTop.children[i].body.velocity.x = this.gameVelocity;
+                    }
+
+                    for (var i = 0; i < this.pipesEndBottom.children.length; i++) {
+                        this.pipesEndBottom.children[i].body.velocity.x = this.gameVelocity;
+                    }
+                }
+
                 // on découpe le nombre en des chiffres individuels
                 var digits = this.score.toString().split('');
                 var widthNumbers = 0;
@@ -323,8 +355,8 @@ gameState.main.prototype = {
                 }
             }
 
-            // On rajoute un tuyau tous les DELTA_PIPES pixel
-            if(this.pipesToCheckForAdd.length != 0 && this.pipesToCheckForAdd[0].x + this.pipesToCheckForAdd[0].width / 2 < (this.game.world.width - DELTA_PIPES)) {
+            // On rajoute un tuyau tous les INITIAL_DELTA_PIPES - this.deltaPipes pixel
+            if(this.pipesToCheckForAdd.length != 0 && this.pipesToCheckForAdd[0].x + this.pipesToCheckForAdd[0].width / 2 < (this.game.world.width - (INITIAL_DELTA_PIPES - this.deltaPipes))) {
                 this.pipesToCheckForAdd.splice(0, 1);
                 // On ajoute un nouveau tuyau
                 this.addGroupPipes();
@@ -350,8 +382,7 @@ gameState.main.prototype = {
             // On change la position du bout de tuyau
             pipe.reset(x, y);
             // On change la vitesse pour qu'il se déplace en même temps que le sol
-            this.game.physics.enable(pipe);
-            pipe.body.velocity.x = -250;
+            pipe.body.velocity.x = this.gameVelocity;
             pipe.body.immovable = true;
             pipe.body.rebound = false;
 
@@ -382,8 +413,7 @@ gameState.main.prototype = {
                 // On change la position du bout de tuyau
                 pipeEnd.reset(x - 4, y);
                 // On change la vitesse pour qu'il se déplace en même temps que le sol
-                this.game.physics.enable(pipeEnd);
-                pipeEnd.body.velocity.x = -250;
+                pipeEnd.body.velocity.x = this.gameVelocity;
                 pipeEnd.body.immovable = true;
                 pipeEnd.body.rebound = false;
 
