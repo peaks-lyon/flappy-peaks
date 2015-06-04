@@ -278,7 +278,7 @@ gameState.main.prototype = {
             this.ceiling.x = 0;
         }
 
-        if(this.plane.body.x + this.plane.width <= 200) {
+        if(this.plane.body.x + this.plane.width <= -200) {
             this.plane.body.x = this.game.width;
         }
 
