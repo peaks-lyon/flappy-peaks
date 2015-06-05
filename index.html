@@ -44,6 +44,7 @@
                 });
 
                 document.querySelector('#registerForm').addEventListener("submit", function(event) {
+                    event.preventDefault();
                     new FirebaseRepository().saveHighscore(
                         this.elements.mail.value,
                         this.elements.prenom.value,
@@ -54,7 +55,6 @@
                                 alert("Nous n'avons pas réussi à sauvegarder ton score. Réessaye !")
                             } else {
                                 modal.hide();
-                                event.preventDefault();
                             }
                         }
                     );
