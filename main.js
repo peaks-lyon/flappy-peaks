@@ -241,8 +241,8 @@ gameState.main.prototype = {
         this.tweenJump = game.add.tween(this.bird);
         this.tweenJump.to({rotation: -Math.PI / 8}, 100, Phaser.Easing.Default, true);
 
-        // Timer qui va appeler la méthode addGroupPipes au bout de 1.5 secondes
-        this.timer = this.game.time.events.loop(1500, this.addGroupPipes, this);
+        // Timer qui va appeler la méthode addGroupPipes au bout de 500 millisecondes
+        this.timer = this.game.time.events.loop(500, this.addGroupPipes, this);
     },
 
     jump: function() {
