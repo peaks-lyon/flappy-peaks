@@ -15,5 +15,12 @@ var FirebaseRepository = (function () {
         }, onComplete);
     };
 
+    FirebaseRepository.prototype.findBestHighScore = function (email) {
+        this.flappyPeaksFirebaseRef.orderByChild('email').once('value', function(data) {
+            var score = _.max(data.exportVal(), function(score){ return score.bestscore; });
+            alert('Ton meilleur score : ' + score.bestscore);
+        });
+    };
+
     return FirebaseRepository;
 })();

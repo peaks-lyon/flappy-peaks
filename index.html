@@ -5,6 +5,7 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 
+        <script type="text/javascript" src="vendor/underscore.min.js"></script>
         <script type="text/javascript" src="vendor/phaser.min.js"></script>
         <script type="text/javascript" src="vendor/firebase.min.js"></script>
 
@@ -38,6 +39,7 @@
         <script>
             document.addEventListener('DOMContentLoaded', function(event) {
                 var modal = new Modal('#modalRegisterForm');
+                var ref   = new FirebaseRepository();
 
                 document.querySelector('#modalRegisterForm .btnCloseModal').addEventListener('click', function() {
                     modal.hide();
@@ -46,7 +48,7 @@
 
                 document.querySelector('#registerForm').addEventListener("submit", function(event) {
                     event.preventDefault();
-                    new FirebaseRepository().saveHighscore(
+                    ref.saveHighscore(
                         this.elements.mail.value,
                         this.elements.prenom.value,
                         this.elements.nom.value,
@@ -55,6 +57,7 @@
                             if (error) {
                                 alert("Nous n'avons pas réussi à sauvegarder ton score. Réessaye !")
                             } else {
+                                ref.findBestHighScore();
                                 modal.hide();
                             }
                         }
