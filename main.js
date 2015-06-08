@@ -105,9 +105,8 @@ gameState.main.prototype = {
         this.background.width = this.game.world.width;
         this.background.height = this.game.world.height;
 
-        this.plane = this.game.add.sprite(this.game.world.width, this.game.world.height / 6, 'plane');
-        this.game.physics.enable(this.plane);
-        this.plane.body.velocity.x = -75;
+        this.plane = this.game.add.sprite(this.game.width / 2, this.game.world.height / 6, 'plane');
+        this.plane.x -= (this.plane.width / 2);
 
         // Tuyaux
         this.pipes = game.add.group();
@@ -279,10 +278,6 @@ gameState.main.prototype = {
         // On répète le plafond
         if(this.ceiling.body.center.x <= 0) {
             this.ceiling.x = 0;
-        }
-
-        if(this.plane.body.x + this.plane.width <= -200) {
-            this.plane.body.x = this.game.width;
         }
 
         if(this.gameStart) {
