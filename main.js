@@ -1,10 +1,10 @@
 const SAFE_ZONE_HEIGHT = 1000;
 const SAFE_ZONE_WIDTH = 640;
-const INITIAL_DELTA_PIPES = 420;
+const INITIAL_DELTA_PIPES = 475;
 const MIN_DELTA_PIPES = 350;
 const DELTA_VELOCITY = 5;
 const DELTA_PIPES = 5;
-const MODULO_PIPES = 3;
+const MODULO_PIPES = 5;
 const MAX_WIDTH = 1200;
 
 var ratio = window.innerHeight / 1000;
@@ -97,7 +97,7 @@ gameState.main.prototype = {
 
         this.gameVelocity = -250;
         this.deltaPipes = 0;
-
+        this.nbPiecesOfPipes = 12;
         /**** SPRITES ****/
 
         // création de l'arrière-plan
@@ -322,6 +322,10 @@ gameState.main.prototype = {
                 this.score++;
 
                 if(this.score % MODULO_PIPES == 0) {
+                    if(this.score % (MODULO_PIPES * 5) == 0) {
+                        this.nbPiecesOfPipes = this.nbPiecesOfPipes + 1;
+                    }
+
                     this.gameVelocity -= DELTA_VELOCITY;
                     this.deltaPipes = ((INITIAL_DELTA_PIPES - this.deltaPipes) <= MIN_DELTA_PIPES) ? MIN_DELTA_PIPES : this.deltaPipes + DELTA_PIPES;
 
@@ -439,7 +443,7 @@ gameState.main.prototype = {
         // On supprime le timer qui ne nous sert plus à rien
         this.game.time.events.remove(this.timer);
 
-        var nbPiecesOfPipes = 12;
+        var nbPiecesOfPipes = this.nbPiecesOfPipes || 12;
         var hole = Math.round(Math.random() * (nbPiecesOfPipes - 7)) + 3;
 
         for (var i = 0; i <= nbPiecesOfPipes; i++)
