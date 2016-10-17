@@ -36,7 +36,33 @@
         </div>
 
         <script>
-            document.addEventListener("DOMContentLoaded",function(a){var b=new Modal("#modalRegisterForm");document.querySelector("#modalRegisterForm .btnCloseModal").addEventListener("click",function(){b.hide(),a.preventDefault()}),document.querySelector("#registerForm").addEventListener("submit",function(a){a.preventDefault(),(new FirebaseRepository).saveHighscore(this.elements.mail.value,this.elements.prenom.value,this.elements.nom.value,this.elements.score.value,function(a){a?alert("Nous n'avons pas r\xe9ussi \xe0 sauvegarder ton score. R\xe9essaye !"):b.hide()})})});
+            document.addEventListener('DOMContentLoaded', function(event) {
+                var modal = new Modal('#modalRegisterForm');
+                document.querySelector('#modalRegisterForm .btnCloseModal').addEventListener('click', function() {
+                    modal.hide();
+                    event.preventDefault();
+                });
+
+                document.querySelector('#registerForm').addEventListener("submit", function(event) {
+                    event.preventDefault();
+                    new FirebaseRepository().saveHighscore(
+                        this.elements.mail.value,
+                        this.elements.prenom.value,
+                        this.elements.nom.value,
+                        this.elements.score.value,
+                        function onComplete(error) {
+                            if (error) {
+                                alert("Nous n'avons pas réussi à sauvegarder ton score. Réessaye !")
+                            } else {
+                                alert("Merci ! N'hésite pas à jeter un oeil à nos offres !")
+                                setTimeout(function() {
+                                    window.location = "http://www.peaks.fr/postuler.php"
+                                }, 500)
+                            }
+                        }
+                    );
+                });
+            });
         </script>
     </body>
 </html>
