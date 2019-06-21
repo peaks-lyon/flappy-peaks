@@ -1,6 +1,6 @@
 var FirebaseRepository = (function () {
     function FirebaseRepository() {
-        this.flappyPeaksFirebaseRef = new Firebase("https://flappypeaks.firebaseio.com/highscores");
+        this.flappyPeaksFirebaseRef = new Firebase("https://flappypeaks-45671.firebaseio.com/highscores");
         this.date = new Date().toString();
     }
 
